@@ -69,6 +69,9 @@ function cellClickHandler (row, col) {
     
     currentPlayer = currentPlayer === CROSS ? ZERO : CROSS;
 
+    if (currentPlayer === ZERO && gameActive) {
+        simpleAI();
+    }
     /* Пользоваться методом для размещения символа в клетке так:
         renderSymbolInCell(ZERO, row, col);
      */
@@ -134,6 +137,41 @@ function checkDraw() {
         }
     }
     return true;
+}
+
+function simpleAI() {
+    if (!gameActive || currentPlayer !== ZERO) return;
+    let emptyCells = [];
+    for (let i = 0; i < boardSize; i++) {
+        for (let j = 0; j < boardSize; j++) {
+            if (board[i][j] === EMPTY) {
+                emptyCells.push([i, j]);
+            }
+        }
+    }
+    
+    if (emptyCells.length > 0) {
+        const [row, col] = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+        makeAIMove(row, col);
+    }
+}
+
+function makeAIMove(row, col) {
+    if (!gameActive || board[row][col] !== EMPTY) return;
+    
+    board[row][col] = ZERO;
+    renderSymbolInCell(ZERO, row, col);
+    if (checkWin(ZERO)) {
+        gameActive = false;
+        alert(`Победил игрок ${ZERO}`);
+        return;
+    }
+    if (checkDraw()) {
+        gameActive = false;
+        alert('Победила дружба');
+        return;
+    }
+    currentPlayer = CROSS;
 }
 
 function renderSymbolInCell (symbol, row, col, color = '#333') {
